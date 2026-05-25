@@ -1,172 +1,342 @@
-#EXTM3U
-#EXTINF:-1,AE Mundo
-45.170.130.224:8000/play/a022/index.m3u8
-#EXTINF:-1,AXN
-45.170.130.224:8000/play/a03g/index.m3u8
-#EXTINF:-1,America TV PY
-45.170.130.224:8000/play/a02o/index.m3u8
-#EXTINF:-1,Animal Planet
-45.170.130.224:8000/play/a01t/index.m3u8
-#EXTINF:-1,BabyFirst
-45.170.130.224:8000/play/a017/index.m3u8
-#EXTINF:-1,C9N
-45.170.130.224:8000/play/a033/index.m3u8
-#EXTINF:-1,CNN Chile
-45.170.130.224:8000/play/a00y/index.m3u8
-#EXTINF:-1,CNN Espanol
-45.170.130.224:8000/play/a01b/index.m3u8
-#EXTINF:-1,Canal Estrellas
-45.170.130.224:8000/play/a026/index.m3u8
-#EXTINF:-1,Cartoon Network
-45.170.130.224:8000/play/a011/index.m3u8
-#EXTINF:-1,Cinecanal
-45.170.130.224:8000/play/a00t/index.m3u8
-#EXTINF:-1,Cinemax
-45.170.130.224:8000/play/a03e/index.m3u8
-#EXTINF:-1,Discovery Channel
-45.170.130.224:8000/play/a01s/index.m3u8
-#EXTINF:-1,Discovery Channel (clone)
-45.170.130.224:8000/play/a04u/index.m3u8
-#EXTINF:-1,Discovery ID
-45.170.130.224:8000/play/a02b/index.m3u8
-#EXTINF:-1,Discovery Kids
-45.170.130.224:8000/play/a01a/index.m3u8
-#EXTINF:-1,Discovery Turbo
-45.170.130.224:8000/play/a03q/index.m3u8
-#EXTINF:-1,Disney Channel
-45.170.130.224:8000/play/a01r/index.m3u8
-#EXTINF:-1,Disney Jr
-45.170.130.224:8000/play/a01m/index.m3u8
-#EXTINF:-1,E Entertainment
-45.170.130.224:8000/play/a01v/index.m3u8
-#EXTINF:-1,ESPN
-45.170.130.224:8000/play/a01y/index.m3u8
-#EXTINF:-1,ESPN 2
-45.170.130.224:8000/play/a01p/index.m3u8
-#EXTINF:-1,ESPN 2 Latin
-45.170.130.224:8000/play/a01x/index.m3u8
-#EXTINF:-1,ESPN 3
-45.170.130.224:8000/play/a03s/index.m3u8
-#EXTINF:-1,ESPN 4
-45.170.130.224:8000/play/a01w/index.m3u8
-#EXTINF:-1,ESPN 4
-45.170.130.224:8000/play/a02k/index.m3u8
-#EXTINF:-1,ESPN CO
-45.170.130.224:8000/play/a034/index.m3u8
-#EXTINF:-1,ESPN HD
-45.170.130.224:8000/play/a04l/index.m3u8
-#EXTINF:-1,EVENTOS HD
-45.170.130.224:8000/play/a04k/index.m3u8
-#EXTINF:-1,Enlace
-45.170.130.224:8000/play/a015/index.m3u8
-#EXTINF:-1,Esne TV
-45.170.130.224:8000/play/a03r/index.m3u8
-#EXTINF:-1,FX
-45.170.130.224:8000/play/a03i/index.m3u8
-#EXTINF:-1,Fox Sports 2
-45.170.130.224:8000/play/a027/index.m3u8
-#EXTINF:-1,Fox Sports 3
-45.170.130.224:8000/play/a028/index.m3u8
-#EXTINF:-1,France 24
-45.170.130.224:8000/play/a02c/index.m3u8
-#EXTINF:-1,GEN HD
-45.170.130.224:8000/play/a04j/index.m3u8
-#EXTINF:-1,GOL TV
-45.170.130.224:8000/play/a01z/index.m3u8
-#EXTINF:-1,HBO 2 sd
-45.170.130.224:8000/play/a01i/index.m3u8
-#EXTINF:-1,HBO Family sd
-45.170.130.224:8000/play/a01l/index.m3u8
-#EXTINF:-1,HBO Plus sd
-45.170.130.224:8000/play/a01j/index.m3u8
-#EXTINF:-1,HBO XTREME SD
-45.170.130.224:8000/play/a01k/index.m3u8
-#EXTINF:-1,HBO sd
-45.170.130.224:8000/play/a03d/index.m3u8
-#EXTINF:-1,History Channel
-45.170.130.224:8000/play/a00s/index.m3u8
-#EXTINF:-1,HomeandHealth
-45.170.130.224:8000/play/a02f/index.m3u8
-#EXTINF:-1,La Tele
-45.170.130.224:8000/play/a03u/index.m3u8
-#EXTINF:-1,Lifetime
-45.170.130.224:8000/play/a018/index.m3u8
-#EXTINF:-1,MTV
-45.170.130.224:8000/play/a00w/index.m3u8
-#EXTINF:-1,NPY
-45.170.130.224:8000/play/a035/index.m3u8
-#EXTINF:-1,Nat Geo
-45.170.130.224:8000/play/a00r/index.m3u8
-#EXTINF:-1,Nick Jr
-45.170.130.224:8000/play/a03p/index.m3u8
-#EXTINF:-1,Nickelodeon
-45.170.130.224:8000/play/a00q/index.m3u8
-#EXTINF:-1,PARAVISION
-45.170.130.224:8000/play/a032/index.m3u8
-#EXTINF:-1,ParaguayTV
-45.170.130.224:8000/play/a02r/index.m3u8
-#EXTINF:-1,RCN Novelas
-45.170.130.224:8000/play/a02a/index.m3u8
-#EXTINF:-1,SBT
-45.170.130.224:8000/play/a04g/index.m3u8
-#EXTINF:-1,SNT
-45.170.130.224:8000/play/a013/index.m3u8
-#EXTINF:-1,SNT HD
-45.170.130.224:8000/play/a04i/index.m3u8
-#EXTINF:-1,STAR CHANNEL
-45.170.130.224:8000/play/a00z/index.m3u8
-#EXTINF:-1,SURTV
-45.170.130.224:8000/play/a036/index.m3u8
-#EXTINF:-1,Sin Limites
-45.170.130.224:8000/play/a02n/index.m3u8
-#EXTINF:-1,Sony
-45.170.130.224:8000/play/a03f/index.m3u8
-#EXTINF:-1,Space
-45.170.130.224:8000/play/a03h/index.m3u8
-#EXTINF:-1,Studio Universal
-45.170.130.224:8000/play/a01o/index.m3u8
-#EXTINF:-1,TCM
-45.170.130.224:8000/play/a010/index.m3u8
-#EXTINF:-1,TELEFUTURO HD
-45.170.130.224:8000/play/a04m/index.m3u8
-#EXTINF:-1,TLC
-45.170.130.224:8000/play/a024/index.m3u8
-#EXTINF:-1,TNT
-45.170.130.224:8000/play/a012/index.m3u8
-#EXTINF:-1,TNT Novelas
-45.170.130.224:8000/play/a02d/index.m3u8
-#EXTINF:-1,TV CAMARA
-45.170.130.224:8000/play/a03x/index.m3u8
-#EXTINF:-1,TVE
-45.170.130.224:8000/play/a016/index.m3u8
-#EXTINF:-1,Telefe
-45.170.130.224:8000/play/a03n/index.m3u8
-#EXTINF:-1,Telefuturo
-45.170.130.224:8000/play/a014/index.m3u8
-#EXTINF:-1,Telemundo
-45.170.130.224:8000/play/a029/index.m3u8
-#EXTINF:-1,Telenovelas
-45.170.130.224:8000/play/a04s/index.m3u8
-#EXTINF:-1,Trece
-45.170.130.224:8000/play/a02m/index.m3u8
-#EXTINF:-1,TyC
-45.170.130.224:8000/play/a020/index.m3u8
-#EXTINF:-1,USA SD
-45.170.130.224:8000/play/a019/index.m3u8
-#EXTINF:-1,Unicanal
-45.170.130.224:8000/play/a03o/index.m3u8
-#EXTINF:-1,Universal
-45.170.130.224:8000/play/a00u/index.m3u8
-#EXTINF:-1,Universal Cinema SD
-45.170.130.224:8000/play/a04o/index.m3u8
-#EXTINF:-1,Universal Comedy SD
-45.170.130.224:8000/play/a04p/index.m3u8
-#EXTINF:-1,Universal Premiere SD
-45.170.130.224:8000/play/a04n/index.m3u8
-#EXTINF:-1,ViaX
-45.170.130.224:8000/play/a025/index.m3u8
-#EXTINF:-1,Warner
-45.170.130.224:8000/play/a01u/index.m3u8
-#EXTINF:-1,Zona Latina
-45.170.130.224:8000/play/a00x/index.m3u8
-
+[
+  {
+    "name": "AE Mundo",
+    "url": "http://45.170.130.224:8000/play/a022/index.m3u8"
+  },
+  {
+    "name": "AXN",
+    "url": "http://45.170.130.224:8000/play/a03g/index.m3u8"
+  },
+  {
+    "name": "America TV PY",
+    "url": "http://45.170.130.224:8000/play/a02o/index.m3u8"
+  },
+  {
+    "name": "Animal Planet",
+    "url": "http://45.170.130.224:8000/play/a01t/index.m3u8"
+  },
+  {
+    "name": "BabyFirst",
+    "url": "http://45.170.130.224:8000/play/a017/index.m3u8"
+  },
+  {
+    "name": "C9N",
+    "url": "http://45.170.130.224:8000/play/a033/index.m3u8"
+  },
+  {
+    "name": "CNN Chile",
+    "url": "http://45.170.130.224:8000/play/a00y/index.m3u8"
+  },
+  {
+    "name": "CNN Espanol",
+    "url": "http://45.170.130.224:8000/play/a01b/index.m3u8"
+  },
+  {
+    "name": "Canal Estrellas",
+    "url": "http://45.170.130.224:8000/play/a026/index.m3u8"
+  },
+  {
+    "name": "Cartoon Network",
+    "url": "http://45.170.130.224:8000/play/a011/index.m3u8"
+  },
+  {
+    "name": "Cinecanal",
+    "url": "http://45.170.130.224:8000/play/a00t/index.m3u8"
+  },
+  {
+    "name": "Cinemax",
+    "url": "http://45.170.130.224:8000/play/a03e/index.m3u8"
+  },
+  {
+    "name": "Discovery Channel",
+    "url": "http://45.170.130.224:8000/play/a01s/index.m3u8"
+  },
+  {
+    "name": "Discovery Channel (clone)",
+    "url": "http://45.170.130.224:8000/play/a04u/index.m3u8"
+  },
+  {
+    "name": "Discovery ID",
+    "url": "http://45.170.130.224:8000/play/a02b/index.m3u8"
+  },
+  {
+    "name": "Discovery Kids",
+    "url": "http://45.170.130.224:8000/play/a01a/index.m3u8"
+  },
+  {
+    "name": "Discovery Turbo",
+    "url": "http://45.170.130.224:8000/play/a03q/index.m3u8"
+  },
+  {
+    "name": "Disney Channel",
+    "url": "http://45.170.130.224:8000/play/a01r/index.m3u8"
+  },
+  {
+    "name": "Disney Jr",
+    "url": "http://45.170.130.224:8000/play/a01m/index.m3u8"
+  },
+  {
+    "name": "E Entertainment",
+    "url": "http://45.170.130.224:8000/play/a01v/index.m3u8"
+  },
+  {
+    "name": "ESPN",
+    "url": "http://45.170.130.224:8000/play/a01y/index.m3u8"
+  },
+  {
+    "name": "ESPN 2",
+    "url": "http://45.170.130.224:8000/play/a01p/index.m3u8"
+  },
+  {
+    "name": "ESPN 2 Latin",
+    "url": "http://45.170.130.224:8000/play/a01x/index.m3u8"
+  },
+  {
+    "name": "ESPN 3",
+    "url": "http://45.170.130.224:8000/play/a03s/index.m3u8"
+  },
+  {
+    "name": "ESPN 4",
+    "url": "http://45.170.130.224:8000/play/a01w/index.m3u8"
+  },
+  {
+    "name": "ESPN 4 (Alt)",
+    "url": "http://45.170.130.224:8000/play/a02k/index.m3u8"
+  },
+  {
+    "name": "ESPN CO",
+    "url": "http://45.170.130.224:8000/play/a034/index.m3u8"
+  },
+  {
+    "name": "ESPN HD",
+    "url": "http://45.170.130.224:8000/play/a04l/index.m3u8"
+  },
+  {
+    "name": "EVENTOS HD",
+    "url": "http://45.170.130.224:8000/play/a04k/index.m3u8"
+  },
+  {
+    "name": "Enlace",
+    "url": "http://45.170.130.224:8000/play/a015/index.m3u8"
+  },
+  {
+    "name": "Esne TV",
+    "url": "http://45.170.130.224:8000/play/a03r/index.m3u8"
+  },
+  {
+    "name": "FX",
+    "url": "http://45.170.130.224:8000/play/a03i/index.m3u8"
+  },
+  {
+    "name": "Fox Sports 2",
+    "url": "http://45.170.130.224:8000/play/a027/index.m3u8"
+  },
+  {
+    "name": "Fox Sports 3",
+    "url": "http://45.170.130.224:8000/play/a028/index.m3u8"
+  },
+  {
+    "name": "France 24",
+    "url": "http://45.170.130.224:8000/play/a02c/index.m3u8"
+  },
+  {
+    "name": "GEN HD",
+    "url": "http://45.170.130.224:8000/play/a04j/index.m3u8"
+  },
+  {
+    "name": "GOL TV",
+    "url": "http://45.170.130.224:8000/play/a01z/index.m3u8"
+  },
+  {
+    "name": "HBO 2 sd",
+    "url": "http://45.170.130.224:8000/play/a01i/index.m3u8"
+  },
+  {
+    "name": "HBO Family sd",
+    "url": "http://45.170.130.224:8000/play/a01l/index.m3u8"
+  },
+  {
+    "name": "HBO Plus sd",
+    "url": "http://45.170.130.224:8000/play/a01j/index.m3u8"
+  },
+  {
+    "name": "HBO XTREME SD",
+    "url": "http://45.170.130.224:8000/play/a01k/index.m3u8"
+  },
+  {
+    "name": "HBO sd",
+    "url": "http://45.170.130.224:8000/play/a03d/index.m3u8"
+  },
+  {
+    "name": "History Channel",
+    "url": "http://45.170.130.224:8000/play/a00s/index.m3u8"
+  },
+  {
+    "name": "HomeandHealth",
+    "url": "http://45.170.130.224:8000/play/a02f/index.m3u8"
+  },
+  {
+    "name": "La Tele",
+    "url": "http://45.170.130.224:8000/play/a03u/index.m3u8"
+  },
+  {
+    "name": "Lifetime",
+    "url": "http://45.170.130.224:8000/play/a018/index.m3u8"
+  },
+  {
+    "name": "MTV",
+    "url": "http://45.170.130.224:8000/play/a00w/index.m3u8"
+  },
+  {
+    "name": "NPY",
+    "url": "http://45.170.130.224:8000/play/a035/index.m3u8"
+  },
+  {
+    "name": "Nat Geo",
+    "url": "http://45.170.130.224:8000/play/a00r/index.m3u8"
+  },
+  {
+    "name": "Nick Jr",
+    "url": "http://45.170.130.224:8000/play/a03p/index.m3u8"
+  },
+  {
+    "name": "Nickelodeon",
+    "url": "http://45.170.130.224:8000/play/a00q/index.m3u8"
+  },
+  {
+    "name": "PARAVISION",
+    "url": "http://45.170.130.224:8000/play/a032/index.m3u8"
+  },
+  {
+    "name": "ParaguayTV",
+    "url": "http://45.170.130.224:8000/play/a02r/index.m3u8"
+  },
+  {
+    "name": "RCN Novelas",
+    "url": "http://45.170.130.224:8000/play/a02a/index.m3u8"
+  },
+  {
+    "name": "SBT",
+    "url": "http://45.170.130.224:8000/play/a04g/index.m3u8"
+  },
+  {
+    "name": "SNT",
+    "url": "http://45.170.130.224:8000/play/a013/index.m3u8"
+  },
+  {
+    "name": "SNT HD",
+    "url": "http://45.170.130.224:8000/play/a04i/index.m3u8"
+  },
+  {
+    "name": "STAR CHANNEL",
+    "url": "http://45.170.130.224:8000/play/a00z/index.m3u8"
+  },
+  {
+    "name": "SURTV",
+    "url": "http://45.170.130.224:8000/play/a036/index.m3u8"
+  },
+  {
+    "name": "Sin Limites",
+    "url": "http://45.170.130.224:8000/play/a02n/index.m3u8"
+  },
+  {
+    "name": "Sony",
+    "url": "http://45.170.130.224:8000/play/a03f/index.m3u8"
+  },
+  {
+    "name": "Space",
+    "url": "http://45.170.130.224:8000/play/a03h/index.m3u8"
+  },
+  {
+    "name": "Studio Universal",
+    "url": "http://45.170.130.224:8000/play/a01o/index.m3u8"
+  },
+  {
+    "name": "TCM",
+    "url": "http://45.170.130.224:8000/play/a010/index.m3u8"
+  },
+  {
+    "name": "TELEFUTURO HD",
+    "url": "http://45.170.130.224:8000/play/a04m/index.m3u8"
+  },
+  {
+    "name": "TLC",
+    "url": "http://45.170.130.224:8000/play/a024/index.m3u8"
+  },
+  {
+    "name": "TNT",
+    "url": "http://45.170.130.224:8000/play/a012/index.m3u8"
+  },
+  {
+    "name": "TNT Novelas",
+    "url": "http://45.170.130.224:8000/play/a02d/index.m3u8"
+  },
+  {
+    "name": "TV CAMARA",
+    "url": "http://45.170.130.224:8000/play/a03x/index.m3u8"
+  },
+  {
+    "name": "TVE",
+    "url": "http://45.170.130.224:8000/play/a016/index.m3u8"
+  },
+  {
+    "name": "Telefe",
+    "url": "http://45.170.130.224:8000/play/a03n/index.m3u8"
+  },
+  {
+    "name": "Telefuturo",
+    "url": "http://45.170.130.224:8000/play/a014/index.m3u8"
+  },
+  {
+    "name": "Telemundo",
+    "url": "http://45.170.130.224:8000/play/a029/index.m3u8"
+  },
+  {
+    "name": "Telenovelas",
+    "url": "http://45.170.130.224:8000/play/a04s/index.m3u8"
+  },
+  {
+    "name": "Trece",
+    "url": "http://45.170.130.224:8000/play/a02m/index.m3u8"
+  },
+  {
+    "name": "TyC",
+    "url": "http://45.170.130.224:8000/play/a020/index.m3u8"
+  },
+  {
+    "name": "USA SD",
+    "url": "http://45.170.130.224:8000/play/a019/index.m3u8"
+  },
+  {
+    "name": "Unicanal",
+    "url": "http://45.170.130.224:8000/play/a03o/index.m3u8"
+  },
+  {
+    "name": "Universal",
+    "url": "http://45.170.130.224:8000/play/a00u/index.m3u8"
+  },
+  {
+    "name": "Universal Cinema SD",
+    "url": "http://45.170.130.224:8000/play/a04o/index.m3u8"
+  },
+  {
+    "name": "Universal Comedy SD",
+    "url": "http://45.170.130.224:8000/play/a04p/index.m3u8"
+  },
+  {
+    "name": "Universal Premiere SD",
+    "url": "http://45.170.130.224:8000/play/a04n/index.m3u8"
+  },
+  {
+    "name": "ViaX",
+    "url": "http://45.170.130.224:8000/play/a025/index.m3u8"
+  },
+  {
+    "name": "Warner",
+    "url": "http://45.170.130.224:8000/play/a01u/index.m3u8"
+  },
+  {
+    "name": "Zona Latina",
+    "url": "http://45.170.130.224:8000/play/a00x/index.m3u8"
+  }
+]
