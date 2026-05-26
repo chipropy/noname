@@ -1,7 +1,49 @@
 [
   {
-    "name": "AE Mundo",
-    "url": "http://45.170.130.224:8000/play/a022/index.m3u8"
+    "name": "TIGO SPORT",
+    "url": "https://sam-py-edge02.tigo.com.py/ccur-session/6a070eb182/rolling-buffer/TigoSP4_WM/TigoSP4_WM/transmux/index.mpd"
+  },
+  {
+        "name": "ESPN",
+    "url": "http://45.170.130.224:8000/play/a01y/index.m3u8"
+  },
+  {
+    "name": "ESPN 2",
+    "url": "http://45.170.130.224:8000/play/a01p/index.m3u8"
+  },
+  {
+    "name": "ESPN 2 Latin",
+    "url": "http://45.170.130.224:8000/play/a01x/index.m3u8"
+  },
+  {
+    "name": "ESPN 3",
+    "url": "http://45.170.130.224:8000/play/a03s/index.m3u8"
+  },
+  {
+    "name": "ESPN 4",
+    "url": "http://45.170.130.224:8000/play/a01w/index.m3u8"
+  },
+  {
+    "name": "ESPN 4 (Alt)",
+    "url": "http://45.170.130.224:8000/play/a02k/index.m3u8"
+  },
+  {
+    "name": "ESPN CO",
+    "url": "http://45.170.130.224:8000/play/a034/index.m3u8"
+  },
+  {
+    "name": "ESPN HD",
+    "url": "http://45.170.130.224:8000/play/a04l/index.m3u8"
+  },
+  {
+    "name": "EVENTOS HD",
+    "url": "http://45.170.130.224:8000/play/a04k/index.m3u8"
+  },
+  {
+    "name": "Enlace",
+    "url": "http://45.170.130.224:8000/play/a015/index.m3u8"
+  },
+  {
   },
   {
     "name": "AXN",
@@ -80,46 +122,7 @@
     "url": "http://45.170.130.224:8000/play/a01v/index.m3u8"
   },
   {
-    "name": "ESPN",
-    "url": "http://45.170.130.224:8000/play/a01y/index.m3u8"
-  },
-  {
-    "name": "ESPN 2",
-    "url": "http://45.170.130.224:8000/play/a01p/index.m3u8"
-  },
-  {
-    "name": "ESPN 2 Latin",
-    "url": "http://45.170.130.224:8000/play/a01x/index.m3u8"
-  },
-  {
-    "name": "ESPN 3",
-    "url": "http://45.170.130.224:8000/play/a03s/index.m3u8"
-  },
-  {
-    "name": "ESPN 4",
-    "url": "http://45.170.130.224:8000/play/a01w/index.m3u8"
-  },
-  {
-    "name": "ESPN 4 (Alt)",
-    "url": "http://45.170.130.224:8000/play/a02k/index.m3u8"
-  },
-  {
-    "name": "ESPN CO",
-    "url": "http://45.170.130.224:8000/play/a034/index.m3u8"
-  },
-  {
-    "name": "ESPN HD",
-    "url": "http://45.170.130.224:8000/play/a04l/index.m3u8"
-  },
-  {
-    "name": "EVENTOS HD",
-    "url": "http://45.170.130.224:8000/play/a04k/index.m3u8"
-  },
-  {
-    "name": "Enlace",
-    "url": "http://45.170.130.224:8000/play/a015/index.m3u8"
-  },
-  {
+
     "name": "Esne TV",
     "url": "http://45.170.130.224:8000/play/a03r/index.m3u8"
   },
