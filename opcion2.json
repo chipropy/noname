@@ -1,5 +1,5 @@
 [
-  {"name": "AmericaTV", "category": "GENERAL", "url": "https://cdn.cvattv.com.ar/live/c3eds/AmericaTV/sa_hls_full_e_95AEFABF606F67368D62A486/AmericaTV.m3u8"},
+  {"name": "AmericaTV", "category": "GENERAL", "url": "https://chromecast.cvattv.com.ar/live/c4eds/ESPN2_PY/SA_Live_dash_enc/ESPN2_PY.mpd"},
   {"name": "Info Mora", "category": "GENERAL", "url": "https://cdn.cvattv.com.ar/live/c4eds/Info_Mora/sa_hls_full_e_95AEFABF606F67368D62A486/Info_Mora.m3u8"},
   {"name": "Info Flow", "category": "GENERAL", "url": "https://cdn.cvattv.com.ar/live/c7eds/Info_Flow/sa_hls_full_e_95AEFABF606F67368D62A486/Info_Flow.m3u8"},
   {"name": "Metro", "category": "GENERAL", "url": "https://cdn.cvattv.com.ar/live/c6eds/Metro/sa_hls_full_e_95AEFABF606F67368D62A486/Metro.m3u8", "drm_key": "719aa3a5e270c7f69eba374ed80d7986:97ac59118cf4cf242e2c31e87cd38e1e"},
