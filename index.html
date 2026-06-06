@@ -3,171 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APF TV - Reproductor vía Supabase</title>
-    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <title>APF TV Stream - Reproductor Admin (Corregido)</title>
     <style>
-        /* (mismo estilo que antes, o más compacto) */
-        body { font-family: system-ui; background: #0a0f1e; color: white; padding: 2rem; }
-        .card { max-width: 1000px; margin: auto; background: #1e293b; border-radius: 1.5rem; padding: 1.5rem; }
-        video { width: 100%; aspect-ratio: 16/9; background: black; border-radius: 1rem; }
-        button { background: #3b82f6; border: none; padding: 0.5rem 1rem; border-radius: 2rem; color: white; cursor: pointer; }
-        .log { background: #0f172a; padding: 1rem; border-radius: 1rem; font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow: auto; }
-        input { background: #0f172a; border: 1px solid #334155; padding: 0.5rem; border-radius: 2rem; color: white; width: 100%; margin-bottom: 0.5rem; }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', monospace;
+            background: #0a0f1e;
+            color: #e2e8f0;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #1e293b;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 35px -10px black;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 0.25rem 0;
+            background: linear-gradient(135deg, #fff, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .sub {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #3b82f6;
+            padding-left: 0.75rem;
+        }
+        .player-box {
+            background: #000;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        video {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            display: block;
+        }
+        .card-inputs {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+        }
+        input, button {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 10px 16px;
+            border-radius: 40px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        input {
+            flex: 1;
+            min-width: 180px;
+        }
+        button {
+            background: #3b82f6;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #2563eb;
+            transform: scale(0.97);
+        }
+        .btn-sec {
+            background: #334155;
+        }
+        .btn-sec:hover {
+            background: #475569;
+        }
+        .log {
+            background: #0f172a;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            border: 1px solid #2d3a66;
+        }
+        .log-entry {
+            border-bottom: 1px solid #1e293b;
+            padding: 4px 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .error { color: #f87171; }
+        .success { color: #4ade80; }
+        .info { color: #7aa2f7; }
+        .status {
+            background: #0f172a;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        hr {
+            border-color: #2d3a66;
+            margin: 1rem 0;
+        }
     </style>
 </head>
 <body>
-<div class="card">
-    <h1>📡 APF TV · Stream (Supabase directo)</h1>
-    <div>
-        <input type="email" id="email" placeholder="Email" value="guachoo@yopmail.com">
+<div class="container">
+    <h1>🎥 APF TV · Stream Admin</h1>
+    <div class="sub">Reproductor para creadores - Depuración incluida</div>
+
+    <div class="player-box">
+        <video id="videoPlayer" controls playsinline></video>
+    </div>
+
+    <div class="card-inputs">
+        <input type="email" id="email" placeholder="Email APF TV" value="guachoo@yopmail.com">
         <input type="password" id="password" placeholder="Contraseña" value="Mi.xiaomi16">
-        <button id="loginBtn">🔐 Login con Supabase</button>
+        <button id="loginSupabaseBtn">🔐 Login con Supabase</button>
+        <button id="loginApiBtn">🌐 Login con API /auth/login</button>
         <button id="reloadBtn" disabled>🔄 Recargar stream</button>
     </div>
-    <div class="player-container" style="margin-top: 1rem;">
-        <video id="video" controls></video>
+
+    <div class="status" id="statusMsg">⚡ Esperando acción...</div>
+
+    <div class="log" id="logPanel">
+        <div class="log-entry">📡 Inicializado. Elige un método de login.</div>
     </div>
-    <div class="log" id="log">⚡ Esperando acción...</div>
+    <hr>
+    <div style="font-size:0.7rem; text-align:center; color:#5b6e8c;">🔐 Los tokens solo se guardan en memoria local.</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+<!-- Solo cargamos HLS.js y Supabase SDK (sin video.js) -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    // Datos del bundle
+    // ---------- DATOS EXTRAÍDOS DEL BUNDLE ----------
     const SUPABASE_URL = "https://zzxyeihiqslboxjeidsa.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6eHllaWhpcXNsYm94amVpZHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzNzMzMTYsImV4cCI6MjA3Mzk0OTMxNn0.B354mvjXGSz7G902w_HAU8yGTgZwiVlp6L5BU_OdnOI";
+    const API_BASE = "https://api.apftv.live";
     
-    let supabase = null;
-    let currentSession = null;
+    // Variables globales (sin conflictos con globales de librerías)
+    let currentSession = null;      // sesión de Supabase
+    let currentToken = null;        // token JWT de API
     let currentStreamUrl = null;
-    let player = null;
-    const videoEl = document.getElementById('video');
-    const logDiv = document.getElementById('log');
+    let hlsPlayer = null;            // instancia HLS.js
+    const video = document.getElementById('videoPlayer');
     
-    function addLog(msg, isError = false) {
-        const p = document.createElement('div');
-        p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-        p.style.color = isError ? '#f87171' : '#a5f3c3';
-        logDiv.appendChild(p);
+    // Elementos UI
+    const logDiv = document.getElementById('logPanel');
+    const statusSpan = document.getElementById('statusMsg');
+    const reloadBtn = document.getElementById('reloadBtn');
+    
+    // Helper: logs
+    function addLog(message, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        if (type === 'error') entry.classList.add('error');
+        if (type === 'success') entry.classList.add('success');
+        if (type === 'info') entry.classList.add('info');
+        const time = new Date().toLocaleTimeString();
+        entry.innerText = `[${time}] ${message}`;
+        logDiv.appendChild(entry);
         logDiv.scrollTop = logDiv.scrollHeight;
-        console.log(msg);
+        console.log(message);
     }
     
-    async function loginSupabase(email, password) {
-        addLog(`🔐 Intentando login con ${email} vía Supabase...`);
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
-            addLog(`✅ Login exitoso. Usuario: ${data.user.email} (${data.user.id})`);
-            currentSession = data.session;
-            return data.session;
-        } catch (err) {
-            addLog(`❌ Error login Supabase: ${err.message}`, true);
-            return null;
+    function setStatus(text, isError = false) {
+        statusSpan.innerHTML = isError ? `⚠️ ${text}` : `✅ ${text}`;
+        statusSpan.style.color = isError ? '#f87171' : '#86efac';
+    }
+    
+    // Destruir reproductor HLS si existe
+    function destroyPlayer() {
+        if (hlsPlayer) {
+            hlsPlayer.destroy();
+            hlsPlayer = null;
         }
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
     }
     
-    async function fetchStreamUrlFromSupabase(session) {
-        // Primero intentamos obtener la URL desde la API personalizada usando el token de Supabase
-        // O bien consultar directamente una tabla pública (ej: 'streams', 'channels')
-        // Como no conocemos el esquema exacto, probamos ambos:
+    // Cargar stream en el reproductor
+    function loadStream(url) {
+        if (!url) {
+            addLog("No se proporcionó URL de stream", "error");
+            return false;
+        }
+        destroyPlayer();
         
-        // Opción A: Llamar a /stream/url con el token de Supabase (igual que antes, pero ahora el token es JWT de Supabase)
-        try {
-            addLog("📡 Intentando endpoint /stream/url con token Supabase...");
-            const resp = await fetch("https://api.apftv.live/stream/url", {
-                headers: { "Authorization": `Bearer ${session.access_token}` }
-            });
-            if (resp.ok) {
-                const data = await resp.json();
-                addLog("Respuesta API: " + JSON.stringify(data).substring(0, 200));
-                const url = data.url || data.stream_url || data.hls_url;
-                if (url) return url;
-            } else {
-                addLog(`Endpoint devolvió ${resp.status}: ${await resp.text()}`, true);
-            }
-        } catch(e) { addLog(`Error llamando a API: ${e.message}`, true); }
-        
-        // Opción B: Consultar tabla 'streams' (asumiendo estructura)
-        try {
-            addLog("🔍 Buscando en tabla 'streams' de Supabase...");
-            const { data, error } = await supabase
-                .from('streams')
-                .select('url, stream_url, hls_url')
-                .eq('user_id', session.user.id)
-                .maybeSingle();
-            if (!error && data) {
-                const url = data.url || data.stream_url || data.hls_url;
-                if (url) return url;
-            }
-        } catch(e) { addLog(`Error tabla streams: ${e.message}`, true); }
-        
-        // Opción C: Tabla 'channels' o 'live'
-        try {
-            addLog("🔍 Buscando en tabla 'channels'...");
-            const { data, error } = await supabase
-                .from('channels')
-                .select('stream_url, hls_url, url')
-                .eq('owner_id', session.user.id)
-                .maybeSingle();
-            if (!error && data) {
-                const url = data.stream_url || data.hls_url || data.url;
-                if (url) return url;
-            }
-        } catch(e) {}
-        
-        return null;
-    }
-    
-    function initPlayer(url) {
-        if (player && typeof player.dispose === 'function') player.dispose();
         if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(url);
-            hls.attachMedia(videoEl);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                addLog("🎬 Stream listo, reproduciendo...");
-                videoEl.play().catch(e => addLog("Autoplay bloqueado: " + e.message));
+            hlsPlayer = new Hls();
+            hlsPlayer.loadSource(url);
+            hlsPlayer.attachMedia(video);
+            hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                addLog("✅ Manifiesto HLS cargado, reproduciendo...", "success");
+                video.play().catch(e => addLog(`Autoplay bloqueado: ${e.message}`, "error"));
             });
-            hls.on(Hls.Events.ERROR, (_, data) => addLog(`HLS error: ${data.type}`, true));
-            player = { hls };
-        } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
-            videoEl.src = url;
-            addLog("Usando HLS nativo");
-            player = { native: true };
+            hlsPlayer.on(Hls.Events.ERROR, (event, data) => {
+                addLog(`❌ Error HLS: ${data.type} - ${data.details}`, "error");
+            });
+            return true;
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = url;
+            addLog("Usando HLS nativo (Safari)", "success");
+            video.play().catch(e => addLog(`Error reproducción: ${e.message}`, "error"));
+            return true;
         } else {
-            addLog("Navegador no soporta HLS", true);
+            addLog("❌ Tu navegador no soporta HLS", "error");
+            return false;
         }
     }
     
-    document.getElementById('loginBtn').onclick = async () => {
-        const email = document.getElementById('email').value;
-        const pwd = document.getElementById('password').value;
-        if (!supabase) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ---------- MÉTODO 1: LOGIN DIRECTO CON SUPABASE ----------
+    async function loginWithSupabase(email, password) {
+        addLog(`🔐 Iniciando login con Supabase para ${email}...`);
+        // Crear cliente Supabase (sin redeclarar variable global)
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            addLog(`✅ Login Supabase exitoso. Usuario ID: ${data.user.id}`, "success");
+            currentSession = data.session;
+            currentToken = data.session.access_token;  // el token JWT de Supabase sirve para la API también
+            
+            // Intentar obtener URL del stream desde diferentes fuentes
+            let streamUrl = null;
+            
+            // 1) Probar endpoint /stream/url con token de Supabase
+            addLog("🌐 Consultando https://api.apftv.live/stream/url...");
+            try {
+                const resp = await fetch(`${API_BASE}/stream/url`, {
+                    headers: { "Authorization": `Bearer ${currentToken}` }
+                });
+                if (resp.ok) {
+                    const json = await resp.json();
+                    addLog(`Respuesta API: ${JSON.stringify(json).substring(0, 200)}`);
+                    streamUrl = json.url || json.stream_url || json.hls_url;
+                    if (streamUrl) addLog("✅ URL obtenida desde API /stream/url", "success");
+                } else {
+                    addLog(`API respondió con ${resp.status}: ${await resp.text()}`, "error");
+                }
+            } catch(e) { addLog(`Error conectando con API: ${e.message}`, "error"); }
+            
+            // 2) Si no, buscar en tabla 'streams' (asumiendo permisos)
+            if (!streamUrl) {
+                addLog("🔍 Buscando en tabla 'streams' de Supabase...");
+                const { data: streamData, error: streamErr } = await supabaseClient
+                    .from('streams')
+                    .select('url, stream_url, hls_url')
+                    .eq('user_id', data.user.id)
+                    .maybeSingle();
+                if (!streamErr && streamData) {
+                    streamUrl = streamData.url || streamData.stream_url || streamData.hls_url;
+                    if (streamUrl) addLog("URL encontrada en tabla streams", "success");
+                } else {
+                    addLog(`No se pudo consultar streams: ${streamErr?.message || "sin datos"}`, "error");
+                }
+            }
+            
+            // 3) Probar tabla 'channels'
+            if (!streamUrl) {
+                addLog("🔍 Buscando en tabla 'channels'...");
+                const { data: chanData, error: chanErr } = await supabaseClient
+                    .from('channels')
+                    .select('stream_url, hls_url, url')
+                    .eq('owner_id', data.user.id)
+                    .maybeSingle();
+                if (!chanErr && chanData) {
+                    streamUrl = chanData.stream_url || chanData.hls_url || chanData.url;
+                    if (streamUrl) addLog("URL encontrada en tabla channels", "success");
+                }
+            }
+            
+            if (streamUrl) {
+                currentStreamUrl = streamUrl;
+                loadStream(streamUrl);
+                reloadBtn.disabled = false;
+                setStatus("Stream cargado - Usando Supabase");
+            } else {
+                addLog("❌ No se encontró URL del stream después de múltiples intentos", "error");
+                setStatus("No se pudo obtener URL del stream", true);
+            }
+            
+        } catch (err) {
+            addLog(`❌ Error en login Supabase: ${err.message}`, "error");
+            setStatus(`Fallo: ${err.message}`, true);
         }
-        const session = await loginSupabase(email, pwd);
-        if (!session) return;
-        const streamUrl = await fetchStreamUrlFromSupabase(session);
+    }
+    
+    // ---------- MÉTODO 2: LOGIN CON API PROPIA /auth/login ----------
+    async function loginWithApi(email, password) {
+        addLog(`🌐 Login con API ${API_BASE}/auth/login para ${email}...`);
+        try {
+            const response = await fetch(`${API_BASE}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${data.message || data.error || "Credenciales inválidas"}`);
+            }
+            // Extraer token
+            const token = data.token || data.access_token || data.jwt;
+            if (!token) throw new Error("Respuesta sin token");
+            addLog(`✅ Login API exitoso. Token recibido.`, "success");
+            currentToken = token;
+            currentSession = null;  // no es sesión de Supabase
+            
+            // Ahora obtener stream
+            addLog("📡 Solicitando /stream/url con token API...");
+            const streamResp = await fetch(`${API_BASE}/stream/url`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!streamResp.ok) {
+                const errText = await streamResp.text();
+                throw new Error(`Error ${streamResp.status}: ${errText}`);
+            }
+            const streamJson = await streamResp.json();
+            addLog(`Respuesta stream: ${JSON.stringify(streamJson).substring(0, 250)}`);
+            const streamUrl = streamJson.url || streamJson.stream_url || streamJson.hls_url;
+            if (!streamUrl) throw new Error("No se encontró campo de URL en la respuesta");
+            currentStreamUrl = streamUrl;
+            loadStream(streamUrl);
+            reloadBtn.disabled = false;
+            setStatus("Stream cargado - Usando API");
+        } catch (err) {
+            addLog(`❌ Error en login API: ${err.message}`, "error");
+            setStatus(`Fallo API: ${err.message}`, true);
+        }
+    }
+    
+    // Recargar stream con el mismo token/sesión actual
+    async function reloadCurrentStream() {
+        if (!currentToken && !currentSession) {
+            addLog("No hay sesión activa. Haz login primero.", "error");
+            return;
+        }
+        addLog("🔄 Recargando URL del stream...");
+        let streamUrl = null;
+        // Intentar con API /stream/url usando el token que tengamos
+        const token = currentToken || currentSession?.access_token;
+        if (token) {
+            try {
+                const resp = await fetch(`${API_BASE}/stream/url`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (resp.ok) {
+                    const json = await resp.json();
+                    streamUrl = json.url || json.stream_url || json.hls_url;
+                } else {
+                    addLog(`API recarga falló con ${resp.status}`, "error");
+                }
+            } catch(e) { addLog(`Error en recarga: ${e.message}`, "error"); }
+        }
         if (streamUrl) {
             currentStreamUrl = streamUrl;
-            addLog(`📺 URL obtenida: ${streamUrl}`);
-            initPlayer(streamUrl);
-            document.getElementById('reloadBtn').disabled = false;
+            loadStream(streamUrl);
         } else {
-            addLog("No se pudo obtener URL del stream. Revisa permisos o estructura de tablas.", true);
+            addLog("No se pudo obtener nueva URL del stream", "error");
         }
+    }
+    
+    // -------- Asignar eventos después de que el DOM esté listo ----------
+    document.getElementById('loginSupabaseBtn').onclick = () => {
+        const email = document.getElementById('email').value.trim();
+        const pwd = document.getElementById('password').value;
+        if (!email || !pwd) {
+            addLog("Completa email y contraseña", "error");
+            return;
+        }
+        loginWithSupabase(email, pwd);
     };
     
-    document.getElementById('reloadBtn').onclick = async () => {
-        if (!currentSession) return;
-        const newUrl = await fetchStreamUrlFromSupabase(currentSession);
-        if (newUrl) initPlayer(newUrl);
+    document.getElementById('loginApiBtn').onclick = () => {
+        const email = document.getElementById('email').value.trim();
+        const pwd = document.getElementById('password').value;
+        if (!email || !pwd) {
+            addLog("Completa email y contraseña", "error");
+            return;
+        }
+        loginWithApi(email, pwd);
     };
     
-    addLog("✅ Preparado. Introduce credenciales y haz login.");
+    reloadBtn.onclick = () => reloadCurrentStream();
+    
+    addLog("✅ Código cargado correctamente. Prueba ambos métodos de login.", "success");
+    addLog("ℹ️ Si el login falla, verifica que las credenciales sean correctas en la app oficial.", "info");
 </script>
 </body>
 </html>
