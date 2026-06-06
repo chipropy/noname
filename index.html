@@ -2,479 +2,172 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>APF TV Stream - Reproductor Administrador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APF TV - Reproductor vía Supabase</title>
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .card {
-            max-width: 1200px;
-            width: 100%;
-            background: rgba(20, 28, 40, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
-            overflow: hidden;
-            padding: 1.5rem;
-            transition: all 0.2s;
-        }
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin: 0 0 0.25rem 0;
-            background: linear-gradient(135deg, #FFF, #7aa2f7);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .sub {
-            color: #8e9ccf;
-            margin-bottom: 1.8rem;
-            font-size: 0.9rem;
-            border-left: 3px solid #3b82f6;
-            padding-left: 0.75rem;
-        }
-        .player-container {
-            background: #000;
-            border-radius: 1.5rem;
-            overflow: hidden;
-            box-shadow: 0 20px 35px -10px black;
-            margin-bottom: 1.5rem;
-        }
-        video {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            display: block;
-        }
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            background: rgba(0,0,0,0.4);
-            padding: 0.8rem 1rem;
-            border-radius: 2rem;
-        }
-        .btn-group {
-            display: flex;
-            gap: 12px;
-        }
-        button {
-            background: #1e293b;
-            border: none;
-            color: white;
-            font-weight: 500;
-            padding: 8px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid #334155;
-        }
-        button.primary {
-            background: #3b82f6;
-            border-color: #60a5fa;
-            box-shadow: 0 2px 8px rgba(59,130,246,0.3);
-        }
-        button.primary:hover {
-            background: #2563eb;
-            transform: scale(0.97);
-        }
-        button:hover {
-            background: #2d3a54;
-        }
-        .status {
-            font-family: monospace;
-            font-size: 0.8rem;
-            background: #0f1422;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            color: #b9c7f0;
-            word-break: break-all;
-        }
-        .log-area {
-            background: #0a0e1a;
-            border-radius: 1.2rem;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: #a5b4fc;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #1f2a44;
-        }
-        .log-entry {
-            border-bottom: 1px solid #1e293b;
-            padding: 5px 0;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        .log-error {
-            color: #f87171;
-        }
-        .log-success {
-            color: #4ade80;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        input {
-            background: #0f1422;
-            border: 1px solid #2d3a66;
-            padding: 10px 14px;
-            border-radius: 30px;
-            color: white;
-            font-size: 0.85rem;
-            width: 220px;
-            outline: none;
-        }
-        input:focus {
-            border-color: #3b82f6;
-        }
-        hr {
-            border-color: #1e2a44;
-            margin: 1rem 0;
-        }
-        @media (max-width: 700px) {
-            .card { padding: 1rem; }
-            .controls { flex-direction: column; align-items: stretch; }
-            .btn-group { justify-content: center; }
-        }
+        /* (mismo estilo que antes, o más compacto) */
+        body { font-family: system-ui; background: #0a0f1e; color: white; padding: 2rem; }
+        .card { max-width: 1000px; margin: auto; background: #1e293b; border-radius: 1.5rem; padding: 1.5rem; }
+        video { width: 100%; aspect-ratio: 16/9; background: black; border-radius: 1rem; }
+        button { background: #3b82f6; border: none; padding: 0.5rem 1rem; border-radius: 2rem; color: white; cursor: pointer; }
+        .log { background: #0f172a; padding: 1rem; border-radius: 1rem; font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow: auto; }
+        input { background: #0f172a; border: 1px solid #334155; padding: 0.5rem; border-radius: 2rem; color: white; width: 100%; margin-bottom: 0.5rem; }
     </style>
 </head>
 <body>
 <div class="card">
-    <div class="flex-between">
-        <div>
-            <h1>🎥 APF TV · Stream Admin</h1>
-            <div class="sub">Reproductor oficial para creadores / administradores</div>
-        </div>
-        <div>
-            <button id="copyUrlBtn" class="secondary" style="background:#0f172a;">📋 Copiar URL</button>
-        </div>
+    <h1>📡 APF TV · Stream (Supabase directo)</h1>
+    <div>
+        <input type="email" id="email" placeholder="Email" value="guachoo@yopmail.com">
+        <input type="password" id="password" placeholder="Contraseña" value="Mi.xiaomi16">
+        <button id="loginBtn">🔐 Login con Supabase</button>
+        <button id="reloadBtn" disabled>🔄 Recargar stream</button>
     </div>
-
-    <!-- Reproductor video.js (fallback HLS.js) -->
-    <div class="player-container">
-        <video id="myVideo" class="video-js vjs-big-play-centered" controls preload="auto" data-setup='{}'>
-            <p class="vjs-no-js">Para ver este stream activa JavaScript</p>
-        </video>
+    <div class="player-container" style="margin-top: 1rem;">
+        <video id="video" controls></video>
     </div>
-
-    <div class="controls">
-        <div class="btn-group">
-            <button id="loginBtn" class="primary">🔐 Iniciar sesión y cargar stream</button>
-            <button id="reloadStreamBtn">🔄 Recargar stream</button>
-        </div>
-        <div class="status" id="statusText">⚡ Esperando login...</div>
-    </div>
-
-    <!-- Panel de configuración rápida (credenciales) -->
-    <div style="margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 12px;">
-        <input type="email" id="emailInput" placeholder="Email de APF TV" value="guachoo@yopmail.com">
-        <input type="password" id="passwordInput" placeholder="Contraseña" value="Mi.xiaomi16">
-    </div>
-
-    <div class="log-area" id="logArea">
-        <div class="log-entry">📡 Inicializando reproductor...</div>
-        <div class="log-entry">ℹ️ Usa el botón "Iniciar sesión" para autenticarte.</div>
-    </div>
-    <hr>
-    <div style="font-size:0.7rem; text-align:center; color:#4b556b;">🔒 Los datos se usan solo localmente. El token se guarda en memoria.</div>
+    <div class="log" id="log">⚡ Esperando acción...</div>
 </div>
 
-<!-- Librerías externas -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
-    // ---------- CONFIGURACIÓN DE LA API (bundle extraído) ----------
-    const API_BASE = "https://api.apftv.live";
-    // Endpoints conocidos:
-    const LOGIN_ENDPOINT = "/auth/login";
-    const STREAM_URL_ENDPOINT = "/stream/url";   // puede que necesite parámetros extra
-
-    // Variables globales
-    let currentToken = null;
+    // Datos del bundle
+    const SUPABASE_URL = "https://zzxyeihiqslboxjeidsa.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6eHllaWhpcXNsYm94amVpZHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzNzMzMTYsImV4cCI6MjA3Mzk0OTMxNn0.B354mvjXGSz7G902w_HAU8yGTgZwiVlp6L5BU_OdnOI";
+    
+    let supabase = null;
+    let currentSession = null;
     let currentStreamUrl = null;
     let player = null;
-
-    // Elementos DOM
-    const videoElement = document.getElementById('myVideo');
-    const loginBtn = document.getElementById('loginBtn');
-    const reloadBtn = document.getElementById('reloadStreamBtn');
-    const copyBtn = document.getElementById('copyUrlBtn');
-    const statusSpan = document.getElementById('statusText');
-    const emailInput = document.getElementById('emailInput');
-    const passInput = document.getElementById('passwordInput');
-    const logArea = document.getElementById('logArea');
-
-    // Función para agregar logs al panel
-    function addLog(message, type = 'info') {
-        const logDiv = document.createElement('div');
-        logDiv.className = 'log-entry';
-        if (type === 'error') logDiv.classList.add('log-error');
-        if (type === 'success') logDiv.classList.add('log-success');
-        const time = new Date().toLocaleTimeString();
-        logDiv.innerText = `[${time}] ${message}`;
-        logArea.appendChild(logDiv);
-        logArea.scrollTop = logArea.scrollHeight;
-        // También en consola
-        console.log(message);
+    const videoEl = document.getElementById('video');
+    const logDiv = document.getElementById('log');
+    
+    function addLog(msg, isError = false) {
+        const p = document.createElement('div');
+        p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        p.style.color = isError ? '#f87171' : '#a5f3c3';
+        logDiv.appendChild(p);
+        logDiv.scrollTop = logDiv.scrollHeight;
+        console.log(msg);
     }
-
-    // Actualizar estado visual
-    function setStatus(text, isError = false) {
-        statusSpan.innerHTML = isError ? `⚠️ ${text}` : `✅ ${text}`;
-        statusSpan.style.color = isError ? '#f87171' : '#bbf7d0';
+    
+    async function loginSupabase(email, password) {
+        addLog(`🔐 Intentando login con ${email} vía Supabase...`);
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            addLog(`✅ Login exitoso. Usuario: ${data.user.email} (${data.user.id})`);
+            currentSession = data.session;
+            return data.session;
+        } catch (err) {
+            addLog(`❌ Error login Supabase: ${err.message}`, true);
+            return null;
+        }
     }
-
-    // Inicializar reproductor (usando HLS.js para mayor compatibilidad)
-    function initPlayer(url) {
-        if (!url) {
-            addLog("No se puede iniciar reproductor sin URL", "error");
-            return false;
-        }
+    
+    async function fetchStreamUrlFromSupabase(session) {
+        // Primero intentamos obtener la URL desde la API personalizada usando el token de Supabase
+        // O bien consultar directamente una tabla pública (ej: 'streams', 'channels')
+        // Como no conocemos el esquema exacto, probamos ambos:
         
-        // Destruir instancia anterior si existe
-        if (player && typeof player.dispose === 'function') {
-            player.dispose();
-        }
-        
-        // Determinar si el navegador soporta HLS nativo (Safari)
-        if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-            addLog("🍎 Usando HLS nativo (Safari)", "success");
-            player = videojs(videoElement, {
-                sources: [{
-                    src: url,
-                    type: 'application/x-mpegURL'
-                }]
+        // Opción A: Llamar a /stream/url con el token de Supabase (igual que antes, pero ahora el token es JWT de Supabase)
+        try {
+            addLog("📡 Intentando endpoint /stream/url con token Supabase...");
+            const resp = await fetch("https://api.apftv.live/stream/url", {
+                headers: { "Authorization": `Bearer ${session.access_token}` }
             });
-        } else if (Hls.isSupported()) {
-            addLog("📦 Usando HLS.js para reproducción", "success");
-            // Configuración HLS.js manual + video.js no conflictivo
-            // Destruimos cualquier videojs previo y usamos hls directamente
-            if (player) player.dispose();
-            // Reiniciamos el elemento video sin videojs
-            const oldVideo = videoElement;
-            const newVideo = document.createElement('video');
-            newVideo.id = 'myVideo';
-            newVideo.className = 'video-js vjs-big-play-centered';
-            newVideo.controls = true;
-            newVideo.preload = 'auto';
-            oldVideo.parentNode.replaceChild(newVideo, oldVideo);
-            // Reasignar referencia
-            const finalVideo = newVideo;
+            if (resp.ok) {
+                const data = await resp.json();
+                addLog("Respuesta API: " + JSON.stringify(data).substring(0, 200));
+                const url = data.url || data.stream_url || data.hls_url;
+                if (url) return url;
+            } else {
+                addLog(`Endpoint devolvió ${resp.status}: ${await resp.text()}`, true);
+            }
+        } catch(e) { addLog(`Error llamando a API: ${e.message}`, true); }
+        
+        // Opción B: Consultar tabla 'streams' (asumiendo estructura)
+        try {
+            addLog("🔍 Buscando en tabla 'streams' de Supabase...");
+            const { data, error } = await supabase
+                .from('streams')
+                .select('url, stream_url, hls_url')
+                .eq('user_id', session.user.id)
+                .maybeSingle();
+            if (!error && data) {
+                const url = data.url || data.stream_url || data.hls_url;
+                if (url) return url;
+            }
+        } catch(e) { addLog(`Error tabla streams: ${e.message}`, true); }
+        
+        // Opción C: Tabla 'channels' o 'live'
+        try {
+            addLog("🔍 Buscando en tabla 'channels'...");
+            const { data, error } = await supabase
+                .from('channels')
+                .select('stream_url, hls_url, url')
+                .eq('owner_id', session.user.id)
+                .maybeSingle();
+            if (!error && data) {
+                const url = data.stream_url || data.hls_url || data.url;
+                if (url) return url;
+            }
+        } catch(e) {}
+        
+        return null;
+    }
+    
+    function initPlayer(url) {
+        if (player && typeof player.dispose === 'function') player.dispose();
+        if (Hls.isSupported()) {
             const hls = new Hls();
             hls.loadSource(url);
-            hls.attachMedia(finalVideo);
+            hls.attachMedia(videoEl);
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                addLog("✅ Manifiesto HLS cargado, reproduciendo...", "success");
-                finalVideo.play().catch(e => addLog("Autoplay bloqueado: " + e.message, "error"));
+                addLog("🎬 Stream listo, reproduciendo...");
+                videoEl.play().catch(e => addLog("Autoplay bloqueado: " + e.message));
             });
-            hls.on(Hls.Events.ERROR, (event, data) => {
-                addLog(`❌ Error HLS: ${data.type} - ${data.details}`, "error");
-                setStatus("Error en el stream", true);
-            });
-            // Guardar referencia global
-            window.currentHls = hls;
-            player = { isHlsJs: true, hls, video: finalVideo };
-            return true;
+            hls.on(Hls.Events.ERROR, (_, data) => addLog(`HLS error: ${data.type}`, true));
+            player = { hls };
+        } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+            videoEl.src = url;
+            addLog("Usando HLS nativo");
+            player = { native: true };
         } else {
-            addLog("❌ Tu navegador no soporta HLS", "error");
-            setStatus("Navegador incompatible", true);
-            return false;
-        }
-        
-        // Si se usó videojs nativo, añadimos eventos
-        if (player && !player.isHlsJs) {
-            player.on('error', () => addLog("Error en reproductor video.js", "error"));
-            player.on('playing', () => addLog("▶️ Stream reproduciéndose", "success"));
-        }
-        return true;
-    }
-    
-    // Función para cargar stream usando el token actual
-    async function fetchStreamUrl(token) {
-        if (!token) {
-            addLog("No hay token, haz login primero", "error");
-            return null;
-        }
-        
-        setStatus("Obteniendo URL del stream...");
-        addLog("📡 Solicitando a " + API_BASE + STREAM_URL_ENDPOINT);
-        
-        try {
-            const response = await fetch(API_BASE + STREAM_URL_ENDPOINT, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
-            }
-            
-            const data = await response.json();
-            addLog("Respuesta del servidor: " + JSON.stringify(data).substring(0, 300));
-            
-            // Intenta extraer URL de distintos formatos posibles
-            let streamUrl = data.url || data.stream_url || data.hls_url || data.uri || data.playlist;
-            if (!streamUrl && data.data && typeof data.data === 'object') {
-                streamUrl = data.data.url || data.data.stream_url;
-            }
-            if (!streamUrl && Array.isArray(data) && data.length > 0) {
-                streamUrl = data[0].url || data[0].playlist;
-            }
-            
-            if (!streamUrl) {
-                addLog("No se encontró campo de URL en la respuesta", "error");
-                setStatus("Respuesta sin URL de stream", true);
-                return null;
-            }
-            
-            addLog(`✅ Stream URL obtenida: ${streamUrl}`, "success");
-            setStatus("Stream listo");
-            return streamUrl;
-            
-        } catch (err) {
-            addLog(`Error al obtener stream: ${err.message}`, "error");
-            setStatus("Fallo al obtener URL", true);
-            return null;
+            addLog("Navegador no soporta HLS", true);
         }
     }
     
-    // Login a la API
-    async function performLogin(email, password) {
-        addLog(`🔑 Intentando login con ${email}`);
-        setStatus("Autenticando...");
-        
-        try {
-            const response = await fetch(API_BASE + LOGIN_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            
-            if (!response.ok) {
-                const errBody = await response.text();
-                throw new Error(`Login fallido (${response.status}): ${errBody.substring(0, 150)}`);
-            }
-            
-            const data = await response.json();
-            addLog("Login response: " + JSON.stringify(data).substring(0, 200));
-            
-            // Detectar token en diferentes formatos
-            const token = data.token || data.access_token || data.jwt || data.auth_token;
-            if (!token) {
-                addLog("Respuesta de login no contiene token", "error");
-                setStatus("Error: token no encontrado", true);
-                return null;
-            }
-            
-            addLog("✅ Token recibido correctamente", "success");
-            setStatus(`Sesión iniciada como ${email}`);
-            return token;
-            
-        } catch (err) {
-            addLog(`❌ Excepción login: ${err.message}`, "error");
-            setStatus("Error de autenticación", true);
-            return null;
+    document.getElementById('loginBtn').onclick = async () => {
+        const email = document.getElementById('email').value;
+        const pwd = document.getElementById('password').value;
+        if (!supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
-    }
-    
-    // Flujo completo: login -> obtener URL -> reproducir
-    async function fullLoginAndPlay() {
-        const email = emailInput.value.trim();
-        const password = passInput.value;
-        if (!email || !password) {
-            addLog("Completa email y contraseña", "error");
-            return;
-        }
-        
-        // resetear logs visuales opcional (mantener algunos)
-        // No borramos todo para no perder contexto, pero se puede mejorar
-        addLog("🚀 Iniciando proceso...");
-        
-        const token = await performLogin(email, password);
-        if (!token) return;
-        
-        currentToken = token;
-        const streamUrl = await fetchStreamUrl(token);
-        if (!streamUrl) return;
-        
-        currentStreamUrl = streamUrl;
-        // Inicializar reproductor con la URL
-        const success = initPlayer(streamUrl);
-        if (!success) {
-            addLog("No se pudo iniciar el reproductor", "error");
+        const session = await loginSupabase(email, pwd);
+        if (!session) return;
+        const streamUrl = await fetchStreamUrlFromSupabase(session);
+        if (streamUrl) {
+            currentStreamUrl = streamUrl;
+            addLog(`📺 URL obtenida: ${streamUrl}`);
+            initPlayer(streamUrl);
+            document.getElementById('reloadBtn').disabled = false;
         } else {
-            addLog("🎬 Reproductor cargado. Si no inicia automáticamente, da click en play.", "success");
+            addLog("No se pudo obtener URL del stream. Revisa permisos o estructura de tablas.", true);
         }
-    }
+    };
     
-    // Solo recargar el stream (sin re-login, usa token actual)
-    async function reloadStream() {
-        if (!currentToken) {
-            addLog("No hay sesión activa. Haz login primero.", "error");
-            return;
-        }
-        addLog("🔄 Recargando URL del stream...");
-        const newUrl = await fetchStreamUrl(currentToken);
-        if (newUrl) {
-            currentStreamUrl = newUrl;
-            initPlayer(newUrl);
-        }
-    }
+    document.getElementById('reloadBtn').onclick = async () => {
+        if (!currentSession) return;
+        const newUrl = await fetchStreamUrlFromSupabase(currentSession);
+        if (newUrl) initPlayer(newUrl);
+    };
     
-    // Copiar URL al portapapeles
-    function copyStreamUrl() {
-        if (currentStreamUrl) {
-            navigator.clipboard.writeText(currentStreamUrl);
-            addLog("📋 URL del stream copiada al portapapeles", "success");
-            setStatus("URL copiada");
-        } else {
-            addLog("No hay URL de stream activa", "error");
-        }
-    }
-    
-    // Event listeners
-    loginBtn.addEventListener('click', fullLoginAndPlay);
-    reloadBtn.addEventListener('click', reloadStream);
-    copyBtn.addEventListener('click', copyStreamUrl);
-    
-    // Tecla enter en inputs para login (opcional)
-    const inputs = [emailInput, passInput];
-    inputs.forEach(inp => inp.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') fullLoginAndPlay();
-    }));
-    
-    addLog("✨ Código listo. Presiona 'Iniciar sesión y cargar stream'.", "success");
-    addLog("ℹ️ Si el endpoint /stream/url requiere parámetros adicionales (ej: ?channel_id=...), el código puede necesitar ajustes menores.", "info");
+    addLog("✅ Preparado. Introduce credenciales y haz login.");
 </script>
 </body>
 </html>
