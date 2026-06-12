@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ChicoTV · Todos los canales (desde JSON local)</title>
+    <title>ChicoTV · Canales funcionales (filtrados)</title>
     <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body { background: #000; color: #fff; font-family: system-ui, sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
         .app { display: flex; flex-direction: column; height: 100%; background: #0a0a0a; }
-        .header { background: #111; padding: 12px 24px; border-bottom: 1px solid #2c2c2c; display: flex; justify-content: space-between; align-items: center; }
+        .header { background: #111; padding: 12px 24px; border-bottom: 1px solid #2c2c2c; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .header h1 { font-size: 1.6rem; color: #ffc107; }
         .badge { background: #1e1e1e; padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; }
+        .warning { background: #4a2a00; color: #ffaa44; }
         .browser { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 16px 20px; }
         .categories-container { overflow-x: auto; white-space: nowrap; padding-bottom: 12px; margin-bottom: 20px; flex-shrink: 0; }
         .categories { display: inline-flex; gap: 18px; }
@@ -35,31 +36,70 @@
 </head>
 <body>
 <div class="app" id="app">
-    <div class="header"><h1>📺 ChicoTV · Todos los canales</h1><div class="badge" id="statusBadge">🔄 Cargando lista local...</div></div>
-    <div class="browser"><div class="categories-container" id="categoriesContainer"></div><div class="channels-grid" id="channelsGrid"></div></div>
+    <div class="header">
+        <h1>📺 ChicoTV · Canales funcionales</h1>
+        <div class="badge" id="statusBadge">🔄 Cargando...</div>
+    </div>
+    <div class="browser">
+        <div class="categories-container" id="categoriesContainer"></div>
+        <div class="channels-grid" id="channelsGrid"></div>
+        <div id="infoMsg" style="text-align:center; margin-top:10px; font-size:12px; color:#888;"></div>
+    </div>
 </div>
 
 <script>
-    // Cargar el archivo descifrado_limpio.json (debe estar en la misma carpeta)
-    let categoriesData = [];
+    // Lista de dominios que requieren autenticación de Flow (no se pueden reproducir desde web)
+    const BLOCKED_DOMAINS = [
+        "cvattv.com.ar",
+        "chromecast.cvattv.com.ar",
+        "results.femon.net",
+        "portal.app.flow.com.py"
+    ];
+
+    // Función para verificar si una URL es de un dominio bloqueado
+    function isBlockedUrl(url) {
+        if (!url) return true;
+        try {
+            const host = new URL(url).hostname.toLowerCase();
+            return BLOCKED_DOMAINS.some(domain => host.includes(domain));
+        } catch(e) {
+            return false;
+        }
+    }
+
+    // Estado global
+    let categoriesData = [];       // Categorías filtradas
     let activeCategory = 0;
     let categoryButtons = [], channelCards = [];
 
     const categoriesDiv = document.getElementById('categoriesContainer');
     const channelsDiv = document.getElementById('channelsGrid');
     const statusBadge = document.getElementById('statusBadge');
+    const infoMsg = document.getElementById('infoMsg');
 
+    // Cargar JSON local y filtrar
     async function loadLocalJson() {
         try {
             const response = await fetch('descifrado_limpio.json');
-            if (!response.ok) throw new Error(`No se pudo cargar descifrado_limpio.json (HTTP ${response.status})`);
+            if (!response.ok) throw new Error(`No se encontró descifrado_limpio.json (HTTP ${response.status})`);
             const jsonData = await response.json();
-            // Convertir formato del JSON (cada categoría tiene "name" y "samples") a nuestro formato interno
             if (!Array.isArray(jsonData)) throw new Error("Formato inválido");
+
+            let totalOriginal = 0;
+            let totalFiltrados = 0;
             const parsed = [];
+
             for (const cat of jsonData) {
                 if (!cat.name || !Array.isArray(cat.samples)) continue;
-                const channels = cat.samples.filter(s => s && (s.url || s.name)).map(s => ({
+                // Filtrar canales que usan dominios bloqueados
+                const validChannels = cat.samples.filter(sample => {
+                    totalOriginal++;
+                    if (!sample.url) return false;
+                    if (isBlockedUrl(sample.url)) return false;
+                    // También filtrar si el drm_license_uri apunta a results.femon.net
+                    if (sample.drm_license_uri && isBlockedUrl(sample.drm_license_uri)) return false;
+                    return true;
+                }).map(s => ({
                     name: s.name || "Sin nombre",
                     url: s.url,
                     type: s.type || (s.url?.includes('.mpd') ? 'DASH' : (s.url?.includes('.m3u8') ? 'HLS' : null)),
@@ -69,17 +109,25 @@
                     user: s.user || null,
                     headers: s.headers || null
                 }));
-                if (channels.length) parsed.push({ title: cat.name, items: channels });
+
+                totalFiltrados += validChannels.length;
+                if (validChannels.length) {
+                    parsed.push({ title: cat.name, items: validChannels });
+                }
             }
-            if (parsed.length === 0) throw new Error("No se encontraron canales");
+
+            if (parsed.length === 0) {
+                throw new Error(`No se encontraron canales reproducibles. Se bloquearon ${totalOriginal - totalFiltrados} canales con autenticación requerida.`);
+            }
+
             categoriesData = parsed;
-            const total = categoriesData.reduce((a,c)=> a + c.items.length, 0);
-            statusBadge.innerText = `✅ ${categoriesData.length} categorías · ${total} canales`;
+            statusBadge.innerHTML = `✅ ${categoriesData.length} categorías · ${totalFiltrados} canales (${totalOriginal - totalFiltrados} bloqueados por autenticación)`;
+            infoMsg.innerText = `⚠️ Nota: Los canales que requieren sesión de Flow/Cablevisión (cvattv, results.femon.net) han sido ocultados automáticamente. Disfruta de los ${totalFiltrados} canales restantes.`;
             renderUI();
         } catch (err) {
             console.error(err);
-            statusBadge.innerText = "❌ Error al cargar";
-            document.querySelector('.browser').innerHTML = `<div style="text-align:center; margin-top:50px;"><p>⚠️ No se pudo cargar "descifrado_limpio.json".<br>Asegúrate de que el archivo esté en la misma carpeta que este HTML.</p><button class="btn-retry" onclick="location.reload()">Reintentar</button></div>`;
+            statusBadge.innerText = "❌ Error";
+            document.querySelector('.browser').innerHTML = `<div style="text-align:center; margin-top:50px;"><p>⚠️ ${err.message}<br>Asegúrate de que "descifrado_limpio.json" esté en la misma carpeta.</p><button class="btn-retry" onclick="location.reload()">Reintentar</button></div>`;
         }
     }
 
@@ -160,7 +208,7 @@
         if (channelCards.length) channelCards[0].classList.add('focused');
     }
 
-    // ---------- Reproductor (DASH, HLS, ClearKey) ----------
+    // ---------- Reproductor mejorado con headers personalizados ----------
     let currentPlayer = null, currentVideo = null;
 
     function exitPlayer() {
@@ -208,17 +256,19 @@
         const url = channel.url.trim();
         const isMpd = url.includes('.mpd');
         const isM3u8 = url.includes('.m3u8');
+
+        // Construir headers personalizados
         const customHeaders = {};
         if (channel.headers) Object.assign(customHeaders, channel.headers);
-        if (!customHeaders['User-Agent']) customHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+        if (!customHeaders['User-Agent']) customHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36';
         if (!customHeaders['Origin'] && (url.includes('izzigo.tv') || url.includes('aiv-cdn'))) {
             customHeaders['Origin'] = 'https://portal.app.flow.com.py';
             customHeaders['Referer'] = 'https://portal.app.flow.com.py/';
         }
 
-        // DRM ClearKey inline
+        // Obtener DRM inline
         let drmKeyId = null, drmKey = null;
-        if (channel.drm_license_uri) {
+        if (channel.drm_license_uri && !isBlockedUrl(channel.drm_license_uri)) {
             try {
                 const u = new URL(channel.drm_license_uri);
                 drmKeyId = u.searchParams.get('keyid');
@@ -232,37 +282,57 @@
             return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
         }
 
+        // DASH
         if (isMpd) {
             try {
                 const player = dashjs.MediaPlayer().create();
                 currentPlayer = player;
                 player.initialize(video, url, false);
+                // Configuración de headers mediante updateSettings y protección para peticiones de segmentos
                 player.updateSettings({
-                    streaming: { request: { customHeaders: customHeaders }, buffer: { bufferToKeep: 30 } },
+                    streaming: {
+                        request: { 
+                            customHeaders: customHeaders,
+                            // Forzar envío de headers en todas las peticiones
+                            useRequestHeaders: true
+                        },
+                        buffer: { bufferToKeep: 30 },
+                        abr: { autoSwitchBitrate: { video: true } }
+                    },
                     debug: { logLevel: dashjs.Debug.LOG_LEVEL_WARNING }
                 });
+                // Si hay DRM ClearKey
                 if (drmKeyId && drmKey) {
                     const kidB64 = hexToBase64Url(drmKeyId);
                     const keyB64 = hexToBase64Url(drmKey);
                     player.setProtectionData({
-                        'org.w3.clearkey': { clearkeys: { [kidB64]: keyB64 }, httpRequestHeaders: customHeaders }
+                        'org.w3.clearkey': { 
+                            clearkeys: { [kidB64]: keyB64 },
+                            httpRequestHeaders: customHeaders
+                        }
                     });
                 }
                 player.on(dashjs.MediaPlayer.events.PLAYBACK_PLAYING, () => loading.remove());
                 player.on(dashjs.MediaPlayer.events.ERROR, (e) => {
-                    loading.innerHTML = `❌ Error DASH: ${e.error?.message || 'desconocido'}<br><button class="btn-retry" onclick="location.reload()">Recargar</button>`;
+                    let errMsg = e.error?.message || 'desconocido';
+                    loading.innerHTML = `❌ Error DASH: ${errMsg}<br><button class="btn-retry" onclick="location.reload()">Recargar</button>`;
                 });
                 setTimeout(() => { if (loading && !video.currentTime) loading.innerHTML = `⏳ Sin respuesta...<br><button class="btn-retry" onclick="location.reload()">Reintentar</button>`; }, 15000);
             } catch(e) { loading.innerHTML = `Error: ${e.message}`; }
             return;
         }
 
+        // HLS
         if (isM3u8) {
             if (Hls.isSupported()) {
                 const hls = new Hls({
                     xhrSetup: (xhr, reqUrl) => {
-                        for (const [k,v] of Object.entries(customHeaders)) xhr.setRequestHeader(k, v);
-                    }
+                        for (const [k,v] of Object.entries(customHeaders)) {
+                            xhr.setRequestHeader(k, v);
+                        }
+                    },
+                    debug: false,
+                    enableWorker: true
                 });
                 currentPlayer = hls;
                 hls.loadSource(url);
@@ -282,7 +352,7 @@
             return;
         }
 
-        // fallback
+        // Stream directo
         video.src = url;
         video.addEventListener('canplay', () => loading.remove());
         video.play().catch(e => loading.innerHTML = `Error: ${e.message}`);
