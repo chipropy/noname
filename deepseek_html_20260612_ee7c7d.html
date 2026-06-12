@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ChicoTV · Todos los canales (desde JSON local)</title>
+    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body { background: #000; color: #fff; font-family: system-ui, sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        .app { display: flex; flex-direction: column; height: 100%; background: #0a0a0a; }
+        .header { background: #111; padding: 12px 24px; border-bottom: 1px solid #2c2c2c; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.6rem; color: #ffc107; }
+        .badge { background: #1e1e1e; padding: 6px 14px; border-radius: 40px; font-size: 0.8rem; }
+        .browser { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 16px 20px; }
+        .categories-container { overflow-x: auto; white-space: nowrap; padding-bottom: 12px; margin-bottom: 20px; flex-shrink: 0; }
+        .categories { display: inline-flex; gap: 18px; }
+        .category-btn { background: #1f1f1f; border: none; color: #e0e0e0; font-size: 1rem; padding: 8px 20px; border-radius: 60px; cursor: pointer; transition: 0.2s; }
+        .category-btn.focused, .category-btn:focus-visible { background: #ffc107; color: #000; transform: scale(1.02); outline: none; }
+        .channels-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; align-content: start; }
+        .channel-card { background: #151515; border-radius: 16px; cursor: pointer; padding: 16px 8px 12px; text-align: center; border: 2px solid transparent; transition: 0.2s; outline: none; }
+        .channel-card.focused, .channel-card:focus-visible { border-color: #ffc107; background: #262626; transform: scale(1.02); }
+        .channel-icon { width: 70px; height: 70px; background: #2c2c2c; border-radius: 50%; margin: 0 auto 10px; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; }
+        .channel-name { font-size: 0.85rem; font-weight: 500; }
+        .player-fullscreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 1000; display: flex; flex-direction: column; }
+        .video-container { flex: 1; position: relative; background: #000; }
+        video { width: 100%; height: 100%; object-fit: contain; }
+        .player-controls { position: absolute; bottom: 20px; left: 20px; z-index: 10; }
+        .back-btn { background: rgba(0,0,0,0.7); border: 2px solid #ffc107; color: white; padding: 8px 20px; border-radius: 40px; cursor: pointer; }
+        .loading-msg, .error-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,0.85); padding: 20px; border-radius: 20px; text-align: center; z-index: 20; }
+        .btn-retry { background: #ffc107; border: none; color: black; margin-top: 12px; padding: 6px 16px; border-radius: 40px; cursor: pointer; }
+        @media (max-width: 700px) { .channels-grid { grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); } }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <div class="header"><h1>📺 ChicoTV · Todos los canales</h1><div class="badge" id="statusBadge">🔄 Cargando lista local...</div></div>
+    <div class="browser"><div class="categories-container" id="categoriesContainer"></div><div class="channels-grid" id="channelsGrid"></div></div>
+</div>
+
+<script>
+    // Cargar el archivo descifrado_limpio.json (debe estar en la misma carpeta)
+    let categoriesData = [];
+    let activeCategory = 0;
+    let categoryButtons = [], channelCards = [];
+
+    const categoriesDiv = document.getElementById('categoriesContainer');
+    const channelsDiv = document.getElementById('channelsGrid');
+    const statusBadge = document.getElementById('statusBadge');
+
+    async function loadLocalJson() {
+        try {
+            const response = await fetch('descifrado_limpio.json');
+            if (!response.ok) throw new Error(`No se pudo cargar descifrado_limpio.json (HTTP ${response.status})`);
+            const jsonData = await response.json();
+            // Convertir formato del JSON (cada categoría tiene "name" y "samples") a nuestro formato interno
+            if (!Array.isArray(jsonData)) throw new Error("Formato inválido");
+            const parsed = [];
+            for (const cat of jsonData) {
+                if (!cat.name || !Array.isArray(cat.samples)) continue;
+                const channels = cat.samples.filter(s => s && (s.url || s.name)).map(s => ({
+                    name: s.name || "Sin nombre",
+                    url: s.url,
+                    type: s.type || (s.url?.includes('.mpd') ? 'DASH' : (s.url?.includes('.m3u8') ? 'HLS' : null)),
+                    drm_license_uri: s.drm_license_uri || null,
+                    drm_key_pair: s.drm_key_pair || null,
+                    icono: s.icono || null,
+                    user: s.user || null,
+                    headers: s.headers || null
+                }));
+                if (channels.length) parsed.push({ title: cat.name, items: channels });
+            }
+            if (parsed.length === 0) throw new Error("No se encontraron canales");
+            categoriesData = parsed;
+            const total = categoriesData.reduce((a,c)=> a + c.items.length, 0);
+            statusBadge.innerText = `✅ ${categoriesData.length} categorías · ${total} canales`;
+            renderUI();
+        } catch (err) {
+            console.error(err);
+            statusBadge.innerText = "❌ Error al cargar";
+            document.querySelector('.browser').innerHTML = `<div style="text-align:center; margin-top:50px;"><p>⚠️ No se pudo cargar "descifrado_limpio.json".<br>Asegúrate de que el archivo esté en la misma carpeta que este HTML.</p><button class="btn-retry" onclick="location.reload()">Reintentar</button></div>`;
+        }
+    }
+
+    function renderUI() {
+        categoriesDiv.innerHTML = '';
+        channelsDiv.innerHTML = '';
+        categoryButtons = [];
+        categoriesData.forEach((cat, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'category-btn';
+            btn.innerText = cat.title.length > 28 ? cat.title.slice(0,26)+'..' : cat.title;
+            btn.addEventListener('click', () => setActiveCategory(idx, true));
+            btn.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') setActiveCategory(idx+1, true);
+                if (e.key === 'ArrowLeft') setActiveCategory(idx-1, true);
+            });
+            categoriesDiv.appendChild(btn);
+            categoryButtons.push(btn);
+        });
+        setActiveCategory(0, true);
+    }
+
+    function setActiveCategory(idx, focusChannel = true) {
+        if (idx < 0) idx = 0;
+        if (idx >= categoriesData.length) idx = categoriesData.length-1;
+        activeCategory = idx;
+        categoryButtons.forEach((btn, i) => {
+            if (i === activeCategory) btn.classList.add('focused');
+            else btn.classList.remove('focused');
+        });
+        renderChannels(activeCategory);
+        if (focusChannel && channelCards.length) setTimeout(() => channelCards[0]?.focus(), 50);
+    }
+
+    function renderChannels(catIdx) {
+        channelsDiv.innerHTML = '';
+        const cat = categoriesData[catIdx];
+        if (!cat) return;
+        channelCards = [];
+        cat.items.forEach((ch, i) => {
+            const card = document.createElement('div');
+            card.className = 'channel-card';
+            card.tabIndex = 0;
+            const icon = document.createElement('div');
+            icon.className = 'channel-icon';
+            if (ch.icono && ch.icono.startsWith('http')) {
+                icon.style.backgroundImage = `url('${ch.icono}')`;
+                icon.style.backgroundSize = 'cover';
+                icon.innerText = '';
+            } else {
+                let initials = (ch.name || "TV").slice(0,2).toUpperCase();
+                icon.innerText = initials;
+                icon.style.fontSize = '1.6rem';
+                icon.style.backgroundColor = '#3a3a3a';
+            }
+            const nameSpan = document.createElement('div');
+            nameSpan.className = 'channel-name';
+            nameSpan.innerText = ch.name;
+            card.appendChild(icon);
+            card.appendChild(nameSpan);
+            card.addEventListener('click', () => playChannel(ch));
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    let next = i+1;
+                    if (next < channelCards.length) { channelCards[next].focus(); channelCards.forEach(c=>c.classList.remove('focused')); channelCards[next].classList.add('focused'); }
+                } else if (e.key === 'ArrowLeft') {
+                    let prev = i-1;
+                    if (prev >= 0) { channelCards[prev].focus(); channelCards.forEach(c=>c.classList.remove('focused')); channelCards[prev].classList.add('focused'); }
+                } else if (e.key === 'ArrowUp') {
+                    categoryButtons[activeCategory]?.focus();
+                } else if (e.key === 'Enter') {
+                    playChannel(ch);
+                }
+            });
+            channelsDiv.appendChild(card);
+            channelCards.push(card);
+        });
+        if (channelCards.length) channelCards[0].classList.add('focused');
+    }
+
+    // ---------- Reproductor (DASH, HLS, ClearKey) ----------
+    let currentPlayer = null, currentVideo = null;
+
+    function exitPlayer() {
+        if (currentPlayer) {
+            if (typeof currentPlayer.destroy === 'function') currentPlayer.destroy();
+            else if (typeof currentPlayer.detachMedia === 'function') currentPlayer.detachMedia();
+            currentPlayer = null;
+        }
+        if (currentVideo) { currentVideo.pause(); currentVideo.src = ''; currentVideo.load(); currentVideo = null; }
+        const fullDiv = document.getElementById('playerFullscreen');
+        if (fullDiv) fullDiv.remove();
+        if (channelCards.length) channelCards[0]?.focus();
+        else if (categoryButtons.length) categoryButtons[activeCategory]?.focus();
+    }
+
+    function playChannel(channel) {
+        if (!channel.url) return;
+        exitPlayer();
+        const fullDiv = document.createElement('div');
+        fullDiv.className = 'player-fullscreen';
+        fullDiv.id = 'playerFullscreen';
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'video-container';
+        const video = document.createElement('video');
+        video.autoplay = true;
+        video.playsInline = true;
+        videoContainer.appendChild(video);
+        const controls = document.createElement('div');
+        controls.className = 'player-controls';
+        const backBtn = document.createElement('button');
+        backBtn.className = 'back-btn';
+        backBtn.innerText = '← Volver';
+        backBtn.onclick = exitPlayer;
+        controls.appendChild(backBtn);
+        fullDiv.appendChild(videoContainer);
+        fullDiv.appendChild(controls);
+        document.body.appendChild(fullDiv);
+        currentVideo = video;
+
+        const loading = document.createElement('div');
+        loading.className = 'loading-msg';
+        loading.innerText = `📡 Cargando: ${channel.name}...`;
+        videoContainer.appendChild(loading);
+
+        const url = channel.url.trim();
+        const isMpd = url.includes('.mpd');
+        const isM3u8 = url.includes('.m3u8');
+        const customHeaders = {};
+        if (channel.headers) Object.assign(customHeaders, channel.headers);
+        if (!customHeaders['User-Agent']) customHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+        if (!customHeaders['Origin'] && (url.includes('izzigo.tv') || url.includes('aiv-cdn'))) {
+            customHeaders['Origin'] = 'https://portal.app.flow.com.py';
+            customHeaders['Referer'] = 'https://portal.app.flow.com.py/';
+        }
+
+        // DRM ClearKey inline
+        let drmKeyId = null, drmKey = null;
+        if (channel.drm_license_uri) {
+            try {
+                const u = new URL(channel.drm_license_uri);
+                drmKeyId = u.searchParams.get('keyid');
+                drmKey = u.searchParams.get('key');
+            } catch(e) {}
+        }
+        function hexToBase64Url(hex) {
+            const bytes = new Uint8Array(hex.length/2);
+            for (let i=0; i<hex.length; i+=2) bytes[i/2] = parseInt(hex.substr(i,2),16);
+            let b64 = btoa(String.fromCharCode.apply(null,bytes));
+            return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+        }
+
+        if (isMpd) {
+            try {
+                const player = dashjs.MediaPlayer().create();
+                currentPlayer = player;
+                player.initialize(video, url, false);
+                player.updateSettings({
+                    streaming: { request: { customHeaders: customHeaders }, buffer: { bufferToKeep: 30 } },
+                    debug: { logLevel: dashjs.Debug.LOG_LEVEL_WARNING }
+                });
+                if (drmKeyId && drmKey) {
+                    const kidB64 = hexToBase64Url(drmKeyId);
+                    const keyB64 = hexToBase64Url(drmKey);
+                    player.setProtectionData({
+                        'org.w3.clearkey': { clearkeys: { [kidB64]: keyB64 }, httpRequestHeaders: customHeaders }
+                    });
+                }
+                player.on(dashjs.MediaPlayer.events.PLAYBACK_PLAYING, () => loading.remove());
+                player.on(dashjs.MediaPlayer.events.ERROR, (e) => {
+                    loading.innerHTML = `❌ Error DASH: ${e.error?.message || 'desconocido'}<br><button class="btn-retry" onclick="location.reload()">Recargar</button>`;
+                });
+                setTimeout(() => { if (loading && !video.currentTime) loading.innerHTML = `⏳ Sin respuesta...<br><button class="btn-retry" onclick="location.reload()">Reintentar</button>`; }, 15000);
+            } catch(e) { loading.innerHTML = `Error: ${e.message}`; }
+            return;
+        }
+
+        if (isM3u8) {
+            if (Hls.isSupported()) {
+                const hls = new Hls({
+                    xhrSetup: (xhr, reqUrl) => {
+                        for (const [k,v] of Object.entries(customHeaders)) xhr.setRequestHeader(k, v);
+                    }
+                });
+                currentPlayer = hls;
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => loading.remove());
+                hls.on(Hls.Events.ERROR, (_, data) => {
+                    if (data.fatal) loading.innerHTML = `❌ HLS fatal: ${data.type}<br><button class="btn-retry" onclick="location.reload()">Recargar</button>`;
+                });
+                setTimeout(() => { if (loading && !video.currentTime) loading.innerHTML = `⏳ Cargando HLS...<br><button class="btn-retry" onclick="location.reload()">Reintentar</button>`; }, 15000);
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.addEventListener('loadedmetadata', () => loading.remove());
+                video.play().catch(e => loading.innerHTML = `Error: ${e.message}`);
+            } else {
+                loading.innerHTML = "HLS no soportado";
+            }
+            return;
+        }
+
+        // fallback
+        video.src = url;
+        video.addEventListener('canplay', () => loading.remove());
+        video.play().catch(e => loading.innerHTML = `Error: ${e.message}`);
+    }
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.getElementById('playerFullscreen')) exitPlayer(); });
+    loadLocalJson();
+</script>
+</body>
+</html>
